@@ -1,0 +1,6 @@
+Uses Java 11
+
+From the root of the project, run the following on the command line to run the example
+ `mvn compile exec:java -Dexec.mainClass=APITutorial`
+
+ The current version will take 1 search query from the command line
