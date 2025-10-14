@@ -1,3 +1,5 @@
+package services;
+
 import java.util.HashMap;
 
 public class Constants {
@@ -11,6 +13,19 @@ public class Constants {
      */
     public static HashMap<Character, String> ENCODINGS = new HashMap<Character, String>();
 
+    /**
+     *
+     */
+    public static final String SEARCH_PARAMS = "(o|c|color|id|identity|t|type)";
+    /**
+     * All the values that can come after a search parameter to indicate how
+     * the search should be performed for the given search parameter
+     *
+     * Ex. id>g (All cards that has green in its color identity)
+     * o:"target creature" (all cards that have the words "target creature" in
+     *      that exact order in its rules text
+     */
+    public static final String SEARCH_COMPARITORS = "(>|<|>=|<=|!=|:)";
 
     /**
      * Initialize the map of special characters to their percent encodings
@@ -33,7 +48,9 @@ public class Constants {
 
         ENCODINGS.put(':', "%3A");
         ENCODINGS.put(';', "%3B");
+        ENCODINGS.put('<', "%3C");
         ENCODINGS.put('=', "%3D");
+        ENCODINGS.put('>', "%3E");
         ENCODINGS.put('?', "%3F");
 
         ENCODINGS.put('@', "%40");
@@ -56,7 +73,9 @@ public class Constants {
 
         // Assemble the encoded string character by character
         for (char c: vals) {
-            if (ENCODINGS.get(c) == null) {
+            if (c == ' ') {
+                str.append('+');
+            } else if (ENCODINGS.get(c) == null) {
                 str.append(c);
             } else {
                 str.append(ENCODINGS.get(c));

@@ -3,5 +3,4 @@ Uses Java 11
 From the root of the project, run the following on the command line to run the example
  `mvn compile exec:java -Dexec.mainClass=APITutorial`
 
- The current version will take 1 search query from the command line
- It will only perform a name search. It does not accept other parameters like o, mv, id, etc.
+Search function has been updated to allow for advanced search syntax like oracle searching with regex.

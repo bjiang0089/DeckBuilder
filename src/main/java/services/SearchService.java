@@ -1,8 +1,8 @@
+package services;
+
 import com.google.gson.Gson;
 import models.Card;
 import models.SearchResponse;
-import services.Constants;
-import services.SearchService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,36 +11,32 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Scanner;
 
-public class APITutorial {
+public class SearchService {
 
-    public static void main(String[] args) {
-        Constants.initializeEncodings();
-        Gson gson = new Gson();
-        Scanner scan = new Scanner(System.in);
+    /**
+     * Create a search request. Only searches by name
+     * Do not use any other search paramaters like mv= or o:
+     * @param s the name to search
+     * @return HTTP Request searching for the name
+     */
+    public static HttpRequest cardSearch(String s) {
+        HttpRequest getReqest = null;
+        StringBuilder str = new StringBuilder(Constants.URL + "/cards/search?q=");
+        str.append(Constants.percentEncode(s));
 
-        System.out.println("\n\n\n");
-        System.out.println("Enter Scryfall search. Can use advanced search syntax.");
-        System.out.print("> ");
-
-        // Construct Scryfall search GET request
-        HttpRequest getRequest = SearchService.cardSearch(scan.nextLine());
-        scan.close();
-
-        // Construct the HTTP Client to send the request
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = sendSearch(client, getRequest);
-
-        // Print the name of the cards found
-        List<Card> cards = extractData(response, gson);
-        if (cards != null) {
-            for (Card c : cards) {
-                System.out.println(c.getName());
-            }
+        try {
+            getReqest = HttpRequest.newBuilder()
+                    // Search for all cards that have "finale" in its name
+                    .uri(new URI(str.toString()))
+                    .header("User-Agent", "DeckBuilder/1.0")
+                    .header("Accept", "*/*")
+                    .build();
+        } catch (URISyntaxException e) {
+            System.err.println("Invalid URI address");
+            return null;
         }
-
-        System.out.println("\n\n\nEnd of program\n\n\n");
+        return getReqest;
     }
 
     /**
@@ -92,4 +88,5 @@ public class APITutorial {
 
         return searchResult.getData();
     }
+
 }
