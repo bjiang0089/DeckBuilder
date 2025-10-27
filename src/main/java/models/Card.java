@@ -6,6 +6,7 @@ public class Card {
     private String uri;
     private String type_line;
     private String oracle_text;
+    private ImageURI image_uris;
 
     public String getId() {
         return id;
@@ -45,5 +46,13 @@ public class Card {
 
     public void setOracle_text(String oracle_text) {
         this.oracle_text = oracle_text;
+    }
+
+    public ImageURI getImage_uris() {
+        return image_uris;
+    }
+
+    public void setImage_uris(ImageURI image_uris) {
+        this.image_uris = image_uris;
     }
 }

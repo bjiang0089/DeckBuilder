@@ -1,23 +1,36 @@
 import com.google.gson.Gson;
 import models.Card;
-import models.SearchResponse;
 import services.Constants;
+import services.ImageService;
 import services.SearchService;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Tutorial used for using Gson and making API calls
+ * https://youtu.be/9oq7Y8n1t00?si=tG_Xm60enM1xv55N
+ */
 public class APITutorial {
+    private static final Gson gson = new Gson();
+
+    private static final HttpClient client = HttpClient.newHttpClient();
 
     public static void main(String[] args) {
+        getCardByName();
+
+        System.out.println("\n\n\nEnd of program\n\n\n");
+    }
+
+    /**
+     * Tests the search functionality of
+     */
+    private static List<Card> searchRoute() {
         Constants.initializeEncodings();
-        Gson gson = new Gson();
         Scanner scan = new Scanner(System.in);
 
         System.out.println("\n\n\n");
@@ -29,67 +42,31 @@ public class APITutorial {
         scan.close();
 
         // Construct the HTTP Client to send the request
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = sendSearch(client, getRequest);
+        HttpResponse<String> response = SearchService.sendSearch(client, getRequest);
 
         // Print the name of the cards found
-        List<Card> cards = extractData(response, gson);
+        List<Card> cards = SearchService.extractData(response, gson);
         if (cards != null) {
             for (Card c : cards) {
                 System.out.println(c.getName());
             }
         }
-
-        System.out.println("\n\n\nEnd of program\n\n\n");
+        return cards;
     }
 
     /**
-     * Send a search query as a GET request
-     * @param client HTTPClient to send requests
-     * @param req the request to send
-     * @return The response to the HTTP GET Request
+     * Prompts the user for a search. Gets and saves the first card image from the results
+     * to the imgs/ directory.
      */
-    public static HttpResponse<String> sendSearch(HttpClient client, HttpRequest req) {
-        HttpResponse<String> response = null;
-        try {
-            response = client.send(req, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            System.err.println("IO Error Occured");
-        } catch (InterruptedException e) {
-            System.err.println("Request Interupted");
-        } catch (Exception e) {
-            System.err.println("Exception Thrown.");
-        }
+    private static void getCardByName() {
+        List<Card> cards = searchRoute();
+        Card card = cards.get(0);
 
-        return response;
+        // Get the normal image of a card
+        HttpRequest request = ImageService.cardSearch(card.getImage_uris().getPng());
+        String filename = ImageService.imageName(card.getName());
+        HttpResponse<Path> response = ImageService.sendSearch(client, request, filename);
+        System.out.println(response.toString());
     }
 
-    /**
-     * Extract the list of cards found in the search
-     * @param response HTTP response to parse
-     * @param gson GSON object to parse JSON to models.SearchResponse
-     * @return List of Cards or null to indicate an error
-     */
-    public static List<Card> extractData(HttpResponse<String> response, Gson gson) {
-        try {
-            System.out.printf("Response Status: %d\n", response.statusCode());
-//            System.out.printf("\n\n%s", response.body());
-            if (response.statusCode() != 200) {
-                return null;
-            }
-        } catch (Exception e) {
-            System.err.println("Unable to get Status Code");
-            return null;
-        }
-        SearchResponse searchResult = null;
-        try {
-            searchResult = gson.fromJson(response.body(), SearchResponse.class);
-            System.out.printf("Cards returned: %d\n\n", searchResult.getData().size());
-        } catch (Exception e) {
-            System.err.println("Error converting JSon to Search Response");
-            return null;
-        }
-
-        return searchResult.getData();
-    }
 }

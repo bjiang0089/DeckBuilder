@@ -15,20 +15,20 @@ import java.util.List;
 public class SearchService {
 
     /**
-     * Create a search request. Only searches by name
-     * Do not use any other search paramaters like mv= or o:
-     * @param s the name to search
+     * Create a search request. Allows for full Scryfall searches, including parameters.
+     * Does not support ordering the search. Defaults to ordering by name.
+     * @param s the search parameters
      * @return HTTP Request searching for the name
      */
     public static HttpRequest cardSearch(String s) {
         HttpRequest getReqest = null;
-        StringBuilder str = new StringBuilder(Constants.URL + "/cards/search?q=");
-        str.append(Constants.percentEncode(s));
+        StringBuilder uri = new StringBuilder(Constants.URL + "/cards/search?q=");
+        uri.append(Constants.percentEncode(s));
 
         try {
             getReqest = HttpRequest.newBuilder()
                     // Search for all cards that have "finale" in its name
-                    .uri(new URI(str.toString()))
+                    .uri(new URI(uri.toString()))
                     .header("User-Agent", "DeckBuilder/1.0")
                     .header("Accept", "*/*")
                     .build();
