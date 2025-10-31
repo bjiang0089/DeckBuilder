@@ -1,4 +1,7 @@
-Uses Java 11
+Welcome to the DeckBuilder wiki!
+
+DeckBuilder is a personal project to keep up my Java coding skills sharp and to learn how to create web pages. 
+This project is being modeled after [Moxfield](https://moxfield.com), an online deck building website for Magic the Gathering.
 
 From the root of the project, run the following on the command line to run the example
  `mvn compile exec:java -Dexec.mainClass=APITutorial`
